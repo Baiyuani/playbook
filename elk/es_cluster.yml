@@ -2,7 +2,7 @@
 - name: configure elasticsearch cluster
   hosts: es
   tasks: 
-    - name: install openjdk
+    - name: install rpms
       yum: 
         name: java-1.8.0-openjdk,elasticsearch
         state: installed
@@ -26,7 +26,7 @@
       notify: restart_service
       tags: modify_conf
     - name: start service
-      service:
+      service: 
         name: elasticsearch
         state: started
         enabled: yes
