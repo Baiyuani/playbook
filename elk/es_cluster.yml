@@ -1,0 +1,36 @@
+---
+- name: configure elasticsearch cluster
+  hosts: es
+  tasks: 
+    - name: install openjdk
+      yum: 
+        name: java-1.8.0-openjdk,elasticsearch
+        state: installed
+        update_cache: yes
+    - name: config hosts map
+      shell: echo "{{ item }}" >> /etc/hosts
+      with_items: 
+        - "192.168.1.51 es1"
+        - "192.168.1.52 es2"
+        - "192.168.1.53 es3"
+        - "192.168.1.54 es4"
+        - "192.168.1.55 es5"
+    - name: modify config file
+      template: 
+        src: elasticsearch.yml
+        dest: /etc/elasticsearch/
+        backup: yes
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart_service
+      tags: modify_conf
+    - name: start service
+      service:
+        name: elasticsearch
+        state: started
+  handlers: 
+    - name: restart_service
+      service: 
+        name: elasticsearch
+        state: restarted
