@@ -29,6 +29,7 @@
       service:
         name: elasticsearch
         state: started
+        enabled: yes
   handlers: 
     - name: restart_service
       service: 
