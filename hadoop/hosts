@@ -1,0 +1,5 @@
+[hadoop]
+nn1 host_name=nn1
+node1 host_name=node1
+node2 host_name=node2
+node3 host_name=node3

@@ -1,0 +1,64 @@
+---
+- hosts: hadoop
+  tasks: 
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 卸载防火墙
+      yum: 
+        name: firewalld,firewalld-filesystem
+        state: absent
+    - name: 安装jdk
+      yum: 
+        name: java-1.8.0-openjdk,java-1.8.0-openjdk-devel
+        state: installed
+    - name: 发送id_rsa密钥
+      copy: 
+        src: /root/.ssh/id_rsa
+        dest: /root/.ssh/
+        owner: root
+        group: root
+        mode: 0600
+      when: ansible_hostname == "nn1"
+    - name: 取消ssh首次登录check
+      shell: sed -ri '58a UserKnownHostsFile /dev/null' /etc/ssh/ssh_config
+      when: ansible_hostname == "nn1"
+    - shell: sed -ri '58a StrictHostKeyChecking no' /etc/ssh/ssh_config
+      when: ansible_hostname == "nn1"
+    - service: 
+        name: sshd
+        state: restarted
+      when: ansible_hostname == "nn1"
+    - name: 关闭SELinux
+      shell: setenforce 0
+    - lineinfile: 
+        path: /etc/sysconfig/selinux
+        regexp: "^SELINUX="
+        line: "SELINUX=disabled"
+    - name: 安装Hadoop
+      unarchive:
+        src: file/hadoop-2.7.7.tar.gz
+        dest: /usr/local/
+    - shell: mv hadoop-2.7.7 hadoop
+      args: 
+        chdir: /usr/local/
+    - name: 同步配置文件 
+      tags: sync_conf
+      template: 
+        src: "{{ item }}"
+        dest: /usr/local/hadoop/etc/hadoop/
+        owner: root
+        group: root
+        mode: 0644
+      with_items: 
+        - "conf/hadoop-env.sh"
+        - "conf/core-site.xml"
+        - "conf/hdfs-site.xml"
+        - "conf/slaves"
+    - name: 初始化集群并启动服务
+      script: script/init.sh
+      when: ansible_hostname == "nn1"
