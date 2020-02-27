@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 <!--
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,22 +17,8 @@
 <!-- Put site-specific property overrides in this file. -->
 
 <configuration>
-  <property>
-    <name>fs.defaultFS</name> 
-    <value>hdfs://nn1:9000</value>
-    <description>use file system</description>
-  </property>
-  <property>
-    <name>hadoop.tmp.dir</name>
-    <value>/var/hadoop</value>
-    <description>documentroot</description>
-  </property>
-  <property>
-    <name>hadoop.proxyuser.nfsuser.groups</name>
-    <value>*</value>
-  </property>
-  <property>
-    <name>hadoop.proxyuser.nfsuser.hosts</name>
-    <value>*</value>
-  </property>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
 </configuration>

@@ -1,6 +1,9 @@
 ---
 - hosts: hadoop
   tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
     - name: 配置主机名解析
       copy: 
         src: /etc/hosts
@@ -33,19 +36,16 @@
         name: sshd
         state: restarted
       when: ansible_hostname == "nn1"
-    - name: 关闭SELinux
-      shell: setenforce 0
-    - lineinfile: 
-        path: /etc/sysconfig/selinux
-        regexp: "^SELINUX="
-        line: "SELINUX=disabled"
+#    - name: 关闭SELinux
+#      shell: setenforce 0
+#    - lineinfile: 
+#        path: /etc/sysconfig/selinux
+#        regexp: "^SELINUX="
+#        line: "SELINUX=disabled"
     - name: 安装Hadoop
       unarchive:
         src: file/hadoop-2.7.7.tar.gz
-        dest: /usr/local/
-    - shell: mv hadoop-2.7.7 hadoop
-      args: 
-        chdir: /usr/local/
+        dest: /usr/local/hadoop
     - name: 同步配置文件 
       tags: sync_conf
       template: 
@@ -59,6 +59,8 @@
         - "conf/core-site.xml"
         - "conf/hdfs-site.xml"
         - "conf/slaves"
+        - "conf/mapred-site.xml"
+        - "conf/yarn-site.xml"
     - name: 初始化集群并启动服务
       script: script/init.sh
       when: ansible_hostname == "nn1"
