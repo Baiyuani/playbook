@@ -56,12 +56,9 @@
         group: root
         mode: 0644
       with_items: 
-        - "conf/hadoop-env.sh"
-        - "conf/core-site.xml"
-        - "conf/hdfs-site.xml"
-        - "conf/slaves"
-        - "conf/mapred-site.xml"
-        - "conf/yarn-site.xml"
-#    - name: 初始化集群并启动服务
-#      script: script/init.sh
-#      when: ansible_hostname == "nn1"
+        - "conf_ha/hadoop-env.sh"
+        - "conf_ha/core-site.xml"
+        - "conf_ha/hdfs-site.xml"
+        - "conf_ha/slaves"
+        - "conf_ha/mapred-site.xml"
+        - "conf_ha/yarn-site.xml"

@@ -1,0 +1,4 @@
+[kafka]
+node1 host_name=kfk1 broker_id=1
+node2 host_name=kfk2 broker_id=2
+node3 host_name=kfk3 broker_id=3

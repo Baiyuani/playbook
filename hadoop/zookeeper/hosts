@@ -1,0 +1,5 @@
+[zoo]
+nn1 host_name=observer1 myid=4
+node1 host_name=zk1 myid=1
+node2 host_name=zk2 myid=2
+node3 host_name=zk3 myid=3

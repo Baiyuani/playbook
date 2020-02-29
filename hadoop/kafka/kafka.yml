@@ -1,0 +1,30 @@
+---
+- name: 安装kafka
+  hosts: kafka
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 安装java运行环境
+      yum: 
+        name: java-1.8.0-openjdk,java-1.8.0-openjdk
+        state: installed
+        update_cache: yes
+    - name: 同步主机名映射
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 安装kafka
+      unarchive: 
+        src: file/kafka_2.12-2.1.0.tgz
+        dest: /usr/local/
+    - shell: mv /usr/local/kafka_2.12-2.1.0 /usr/local/kafka
+    - name: 同步配置文件
+      tags: sync_conf
+      template: 
+        src: conf/server.properties
+        dest: /usr/local/kafka/config/
+        backup: yes
+    - shell: ./bin/kafka-server-start.sh -daemon config/server.properties
+      args: 
+        chdir: /usr/local/kafka/

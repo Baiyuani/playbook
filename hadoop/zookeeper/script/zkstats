@@ -1,0 +1,17 @@
+#!/bin/bash
+function getzkstat(){
+    exec 2>/dev/null
+    exec 8<>/dev/tcp/$1/2181
+    echo stat >&8
+    Msg=$(cat <&8 |grep -P "^Mode:")
+    echo -e "$1\t${Msg:-Mode: \x1b[31mNULL\x1b[0m}"
+    exec 8<&-
+}
+
+if (( $# == 0 ));then
+    echo "${0##*/} zk1 zk2 zk3 ... ..."
+else
+    for i in $@;do
+        getzkstat ${i}
+    done
+fi
