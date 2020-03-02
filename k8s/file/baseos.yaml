@@ -1,0 +1,17 @@
+---
+apiVersion: extensions/v1beta1         #当前格式的版本
+kind: Deployment                       #当前创建资源的类型， 当前类型是Deployment
+metadata:                              #当前资源的元数据
+  name: test-os                        #当前资源的名字 是元数据必须的项
+spec:                                  #是当前Deployment的规格说明
+  replicas: 3                          #指当前创建的副本数量,默认值为‘1’,写3为创建3个容器
+  template:                            #定义pod的模板
+    metadata:                          #当前pod的元数据
+      labels:                          #至少顶一个labels标签，可任意创建一个 key:value
+        app: test_os
+    spec:                              #当前pod的规格说明
+      containers:                      #容器
+      - name: centos                   #是容器的名字容器名字是必须填写的
+        image: 192.168.1.16:5000/myos:latest         #镜像的名称和标签:w
+        stdin: true 
+        tty: true 

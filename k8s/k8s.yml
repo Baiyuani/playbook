@@ -1,0 +1,48 @@
+---
+- name: 安装k8s
+  hosts: k8s
+  tasks: 
+    - copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - yum: 
+        name: firewalld,firewalld-filesystem
+        state: absent
+    - yum: 
+        name: etcd,kubernetes-master,kubernetes-client
+        state: latest
+        update_cache: yes
+    - name: 同步etcd
+      copy: 
+        src: conf/etcd.conf
+        dest: /etc/etcd/
+    - name: 同步配置文件
+        src: "{{ item }}"
+        dest: /etc/kubernetes/
+      with_items: 
+        - "conf/config"
+        - "conf/apiserver"
+    - name: 启动服务
+      tags: restart
+      service: 
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      with_items: 
+        - "kube-apiserver" 
+        - "kube-controller-manager"
+        - "kube-scheduler"
+        - "etcd"
+    - shell: etcdctl mk /atomic.io/network/config '{"Network": "10.254.0.0/16", "Backend": {"Type": "vxlan"}}'
+    - name: 安装flannel
+      yum: 
+        name: flannel
+        state: latest
+    - name: 同步flannel配置文件
+      copy: 
+        src: conf/flanneld 
+        dest: /etc/sysconfig/
+    - name: 启动flannel
+      service: 
+        name: flanneld
+        state: started

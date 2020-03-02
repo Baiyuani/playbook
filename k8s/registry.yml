@@ -1,0 +1,21 @@
+---
+- name: 安装docker镜像仓库
+  hosts: registry
+  tasks: 
+    - name: 修改主机名
+      hostname:
+        name: "{{ host_name }}"
+    - name: 同步主机名解析
+      copy:
+        src: /etc/hosts
+        dest: /etc/
+    - name: 安装docker仓库
+      yum:
+        name: docker-distribution
+        update_cache: yes
+        state: installed
+    - name: 启动服务
+      service: 
+        name: docker-distribution
+        state: started
+        enabled: yes

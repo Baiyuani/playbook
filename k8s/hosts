@@ -1,0 +1,12 @@
+[docker]
+docker1 host_name=docker1
+docker2 host_name=docker2
+docker3 host_name=docker3
+docker4 host_name=docker4
+docker5 host_name=docker5
+
+[k8s_host]
+k8s host_name=k8s
+
+[registry_host]
+registry host_name=registry

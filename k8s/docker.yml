@@ -1,0 +1,36 @@
+---
+- name: 安装docker
+  hosts: docker
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 同步主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 卸载firewalld
+      yum: 
+        name: firewalld,firewalld-filesystem
+        state: absent
+    - name: 安装docker  
+      yum: 
+        name: docker 
+        update_cache: yes
+        state: installed
+    - name: 启动docker 
+      service: 
+        name: docker
+        state: started
+        enabled: yes
+    - name: 同步配置文件
+      tags: sync_conf
+      notify: restart_docker
+      copy: 
+        src: conf/daemon.json
+        dest: /etc/docker/
+  handlers: 
+    - name: restart_docker
+      service: 
+        name: docker
+        state: restarted
