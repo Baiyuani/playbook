@@ -1,0 +1,5 @@
+[local]
+baseurl=ftp://192.168.1.252/localrepo
+gpgcheck=0
+enabled=1
+name=local rpms repo
