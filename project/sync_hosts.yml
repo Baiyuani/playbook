@@ -1,0 +1,7 @@
+---
+- name: 同步恶心的主机名解析
+  hosts: all
+  tasks: 
+    - copy: 
+        src: /etc/hosts
+        dest: /etc/

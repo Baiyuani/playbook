@@ -1,0 +1,57 @@
+---
+- name: 配置mysql
+  hosts: mysql
+  tasks: 
+    - name: 同步主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 发送密钥id_rsa
+      copy:
+        src: /root/.ssh/id_rsa
+        dest: /root/.ssh/
+        owner: root
+        group: root
+        mode: 0600
+    - name: 取消ssh首次连接check
+      shell: sed -ri '35a StrictHostKeyChecking no' /etc/ssh/ssh_config
+    - shell: sed -ri '35a  UserKnownHostsFile /dev/null' /etc/ssh/ssh_config
+    - service:
+        name: sshd
+        state: restarted
+    - name: 安装mysql
+      unarchive: 
+        src: file/mysql-5.7.17.tar
+        dest: /root/
+    - shell: yum -y install * 
+      args: 
+        chdir: /root/
+    - name: 同步配置文件
+      tags: sync_conf
+      notify: restart_mysqld
+      template: 
+        src: conf/my.cnf
+        dest: /etc/
+    - name: 启动服务
+      service: 
+        name: mysqld
+        state: started
+        enabled: yes
+    - name: 为mysql1配置VIP
+      shell: ifconfig eth0:1 192.168.1.187
+      when: ansible_hostname == "mysql1"
+    - name: 安装mhanode软件包
+      yum: 
+        name: mha4mysql-node
+        state: installed
+        update_cache: yes
+    - name: 配置主从结构
+      script: script/ms.sh
+  handlers:
+    - name: restart_mysqld
+      service: 
+        name: mysqld
+        state: restarted

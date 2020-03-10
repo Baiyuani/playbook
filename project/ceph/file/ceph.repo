@@ -1,0 +1,17 @@
+[ceph-tools]
+baseurl=ftp://proxy/cephrepo/Tools
+gpgcheck=0
+enabled=1
+name= ceph-tools
+
+[ceph-MON]
+baseurl=ftp://proxy/cephrepo/MON
+gpgcheck=0
+enabled=1
+name= ceph monitor rpm
+
+[ceph-OSD]
+baseurl=ftp://proxy/cephrepo/OSD
+gpgcheck=0
+enabled=1
+name= ceph osd rpm

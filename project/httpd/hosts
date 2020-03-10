@@ -1,0 +1,4 @@
+[httpd]
+httpd1 host_name=httpd1
+httpd2 host_name=httpd2
+httpd3 host_name=httpd3

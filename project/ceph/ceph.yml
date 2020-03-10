@@ -1,0 +1,78 @@
+---
+- name: 安装ceph集群
+  hosts: ceph
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 发送密钥id_rsa
+      copy: 
+        src: /root/.ssh/id_rsa
+        dest: /root/.ssh/
+        owner: root
+        group: root
+        mode: 0600
+    - name: 取消ssh首次连接check
+      shell: sed -ri '35a StrictHostKeyChecking no' /etc/ssh/ssh_config
+    - shell: sed -ri '35a  UserKnownHostsFile /dev/null' /etc/ssh/ssh_config
+    - service: 
+        name: sshd
+        state: restarted
+    - name: 配置chrony时间同步
+      lineinfile: 
+        path: /etc/chrony.conf
+        regexp: 'server ntp.myhuaweicloud.com iburst'
+        line: 'server proxy iburst'
+    - service: 
+        name: chronyd
+        state: restarted
+    - name: 配置ceph的yum源
+      copy: 
+        src: file/ceph.repo
+        dest: /etc/yum.repos.d/
+        owner: root
+        group: root
+        mode: 0644
+    - name: Solve urllib3 question
+      script: script/urllib3.sh
+#    - yum: 
+#        name: python-urllib3
+#        state: installed
+    - name: 安装软件
+      yum: 
+        update_cache: yes
+        name: ceph-mon,ceph-osd,ceph-mds
+        state: installed
+    - name: 配置monitor主机
+      script: script/monitor.sh
+      when: ansible_hostname == "ceph1"
+    - name: 创建osd缓存设备
+      script: script/parted.sh
+    - name: 修改dev文件权限
+      copy:
+        src: file/70-vdb.rules
+        dest: /etc/udev/rules.d/
+        owner: root
+        group: root
+        mode: 0644
+    - file:
+        owner: ceph
+        group: ceph
+        path: /dev/vdb1
+    - file:
+        owner: ceph
+        group: ceph
+        path: /dev/vdb2
+    - name: 创建osd存储
+      script: script/osd.sh 
+      when: ansible_hostname == "ceph1"
+    - name: 创建mds文件系统，并将密码发送至本机的/root/project/nginx/file/ceph_key.txt
+      script: script/mds.sh
+      when: ansible_hostname == "ceph1"

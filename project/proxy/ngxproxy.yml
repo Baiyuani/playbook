@@ -1,0 +1,109 @@
+---
+- name: 安装nginx7层代理
+  hosts: ngxproxy
+  tasks: 
+    - name: 安装toa内核模块
+      copy: 
+        src: file/toa.ko
+        dest: /root/
+        owner: root
+        group: root
+        mode: 0644  
+    - script: script/toa.sh
+
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    
+    - name: 安装依赖包
+      yum: 
+        update_cache: yes
+        name: gcc,pcre-devel,zlib-devel,openssl-devel
+        state: installed
+    
+    - name: 安装nginx
+      unarchive:
+        src: file/nginx-1.17.0.tar.gz
+        dest: /
+    - replace: 
+        path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+        regexp: 'ngx_http_server_string\[\] = "Server: nginx"'
+        replace: 'ngx_http_server_string[] = "Server: "'
+    - replace: 
+        path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+        regexp: 'ngx_http_server_full_string\[\] = "Server: "'
+        replace: 'ngx_http_server_full_string[] = "Server: tomcat"'
+    - replace: 
+        path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+        regexp: 'ngx_http_server_build_string\[\] = "Server: "'
+        replace: 'ngx_http_server_build_string[] = "Server: tomcat"'
+    - replace: 
+        path: /nginx-1.17.0/src/http/ngx_http_special_response.c
+        regexp: '<hr><center>nginx</center>'
+        replace: '<hr><center>tomcat</center>'
+    - shell: './configure --with-http_stub_status_module --with-http_ssl_module --without-http_autoindex_module --with-http_realip_module --without-http-cache --with-stream' 
+      args:
+        chdir: /nginx-1.17.0
+    - shell: 'make'
+      args:
+        chdir: /nginx-1.17.0
+    - shell: 'make install'
+      args:
+        chdir: /nginx-1.17.0
+   
+    - name: 发送配置文件
+      copy: 
+        src: conf/nginx.conf
+        dest: /usr/local/nginx/conf/
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+      tags: sync_conf
+      notify: nginx_reload
+
+    - name: 将nginx添加到systemd管理
+      copy: 
+        src: file/nginx.service
+        dest: /usr/lib/systemd/system/
+        owner: root
+        group: root
+        mode: 0644
+    - shell: systemctl daemon-reload
+    - name: start nginx service
+      service: 
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: 安装filebeat
+      yum: 
+        name: filebeat
+        state: installed
+        update_cache: yes
+    - name: 同步配置文件
+      copy: 
+        src: conf/filebeat.yml
+        dest: /etc/filebeat/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 启动服务
+      service: 
+        name: filebeat
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: nginx_reload
+      service: 
+        name: nginx
+        state: reloaded

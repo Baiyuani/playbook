@@ -1,0 +1,74 @@
+---
+- name: 修改主机名
+  hostname: 
+    name: "{{ host_name }}"
+
+- name: 配置主机名解析
+  copy: 
+    src: /etc/hosts
+    dest: /etc/
+    owner: root
+    group: root
+    mode: 0644
+
+- name: 安装依赖包
+  yum: 
+    update_cache: yes
+    name: gcc,pcre-devel,zlib-devel,openssl-devel
+    state: installed
+
+- name: 安装nginx
+  unarchive:
+    src: file/nginx-1.17.0.tar.gz
+    dest: /
+- replace: 
+    path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+    regexp: 'ngx_http_server_string\[\] = "Server: nginx"'
+    replace: 'ngx_http_server_string[] = "Server: "'
+- replace: 
+    path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+    regexp: 'ngx_http_server_full_string\[\] = "Server: "'
+    replace: 'ngx_http_server_full_string[] = "Server: tomcat"'
+- replace: 
+    path: /nginx-1.17.0/src/http/ngx_http_header_filter_module.c
+    regexp: 'ngx_http_server_build_string\[\] = "Server: "'
+    replace: 'ngx_http_server_build_string[] = "Server: tomcat"'
+- replace: 
+    path: /nginx-1.17.0/src/http/ngx_http_special_response.c
+    regexp: '<hr><center>nginx</center>'
+    replace: '<hr><center>tomcat</center>'
+- shell: './configure --with-http_stub_status_module --with-http_ssl_module --without-http_autoindex_module --with-http_realip_module --without-http-cache' 
+  args:
+    chdir: /nginx-1.17.0
+- shell: 'make'
+  args:
+    chdir: /nginx-1.17.0
+- shell: 'make install'
+  args:
+    chdir: /nginx-1.17.0
+
+- name: 安装php
+  yum: 
+    name: php,php-fpm,php-mysql,php-devel
+    state: installed
+- name: 安装php扩展redis
+  unarchive: 
+    src: file/php-redis-2.2.4.tar.gz
+    dest: /
+- shell: phpize
+  args: 
+    chdir: /phpredis-2.2.4
+- shell: ./configure --with-php-config=/usr/bin/php-config
+  args: 
+    chdir: /phpredis-2.2.4
+- shell: 'make && make install'
+  args: 
+    chdir: /phpredis-2.2.4
+- copy: 
+    src: conf/php.ini
+    dest: /etc/
+- name: 启动php-fpm
+  service: 
+    name: php-fpm
+    state: started
+    enabled: yes

@@ -1,0 +1,46 @@
+---
+- name: 安装es集群
+  hosts: es
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 安装软件包
+      yum: 
+        name: java-1.8.0-openjdk,elasticsearch
+        state: installed
+        update_cache: yes
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 同步配置文件
+      template: 
+        src: conf/elasticsearch.yml
+        dest: /etc/elasticsearch/
+        backup: yes
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart_service
+      tags: modify_conf
+    - name: start service
+      service: 
+        name: elasticsearch
+        state: started
+        enabled: yes
+    - name: 安装插件
+      shell: '/usr/share/elasticsearch/bin/plugin install ftp://proxy/elk/elasticsearch-kopf-master.zip'
+      when: ansible_hostname == "es1"
+    - shell: '/usr/share/elasticsearch/bin/plugin install ftp://proxy/elk/bigdesk-master.zip'
+      when: ansible_hostname == "es1"
+    - shell: '/usr/share/elasticsearch/bin/plugin install ftp://proxy/elk/elasticsearch-head-master.zip'
+      when: ansible_hostname == "es1"
+  handlers: 
+    - name: restart_service
+      service: 
+        name: elasticsearch
+        state: restarted

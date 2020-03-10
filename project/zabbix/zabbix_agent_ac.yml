@@ -1,0 +1,9 @@
+---
+- name: 安装zabbix客户端程序
+  hosts: mha
+  tasks: 
+    - name: 环境准备：zabbix包
+      unarchive: 
+        src: file/zabbix-3.4.4.tar.gz
+        dest: /root/
+    - script: script/zabbix_agent.sh

@@ -1,0 +1,4 @@
+[ceph]
+ceph1 host_name=ceph1
+ceph2 host_name=ceph2
+ceph3 host_name=ceph3

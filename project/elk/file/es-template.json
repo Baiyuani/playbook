@@ -1,0 +1,157 @@
+{
+    "template" : "logstash-*",
+    "settings" : {
+        "index.refresh_interval" : "5s"
+    },
+    "mappings": {
+        "_default_": {
+            "_all": {
+                "enabled": true, 
+                "omit_norms": true
+            }, 
+            "dynamic_templates": [
+                {
+                    "message_field": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "fielddata": {
+                                "format": "disabled"
+                            }, 
+                            "index": "not_analyzed", 
+                            "omit_norms": true, 
+                            "type": "string"
+                        }, 
+                        "match": "message", 
+                        "match_mapping_type": "string"
+                    }
+                }, 
+                {
+                    "string_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "index": "not_analyzed", 
+                            "omit_norms": true, 
+                            "type": "string"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "string"
+                    }
+                }, 
+                {
+                    "float_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "float"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "float"
+                    }
+                }, 
+                {
+                    "double_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "double"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "double"
+                    }
+                }, 
+                {
+                    "byte_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "byte"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "byte"
+                    }
+                }, 
+                {
+                    "short_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "short"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "short"
+                    }
+                }, 
+                {
+                    "integer_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "integer"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "integer"
+                    }
+                }, 
+                {
+                    "long_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "long"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "long"
+                    }
+                }, 
+                {
+                    "date_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "date"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "date"
+                    }
+                }, 
+                {
+                    "geo_point_fields": {
+                        "mapping": {
+                            "doc_values": true, 
+                            "type": "geo_point"
+                        }, 
+                        "match": "*", 
+                        "match_mapping_type": "geo_point"
+                    }
+                }
+            ], 
+            "properties": {
+                "@timestamp": {
+                    "format": "strict_date_optional_time||epoch_millis", 
+                    "type": "date",
+                    "doc_values": true
+                }, 
+                "@version": {
+                    "index": "not_analyzed", 
+                    "type": "string",
+                    "doc_values" : true
+                }, 
+                "geoip": {
+                    "type": "object",
+                    "dynamic": "true",
+                    "properties": {
+                        "ip": {
+                            "type": "ip",
+                            "doc_values" : true
+                        }, 
+                        "latitude": {
+                            "type": "float",
+                            "doc_values" : true
+                        }, 
+                        "location": {
+                            "type": "geo_point",
+                            "doc_values" : true
+                        }, 
+                        "longitude": {
+                            "type": "float",
+                            "doc_values" : true
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

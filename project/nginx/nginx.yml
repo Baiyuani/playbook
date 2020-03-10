@@ -1,0 +1,12 @@
+---
+- name: 配置nginx的web集群
+  hosts: all
+  tasks: 
+    - import_tasks: tasks/toa.yml
+    - import_tasks: tasks/install.yml
+    - import_tasks: tasks/service.yml
+    - import_tasks: tasks/conf.yml
+    - import_tasks: tasks/mountcephfs.yml
+#    - import_tasks: tasks/filebeat.yml
+  handlers:
+    - import_tasks: tasks/handlers.yml

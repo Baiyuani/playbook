@@ -1,0 +1,13 @@
+[redis]
+redis1 host_name=redis1
+redis2 host_name=redis2
+redis3 host_name=redis3
+redis4 host_name=redis4
+redis5 host_name=redis5
+redis6 host_name=redis6
+
+[redis_host]
+redis_mgm host_name=redis_mgm
+
+[test_host]
+test host_name=test

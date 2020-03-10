@@ -1,0 +1,15 @@
+[es]
+es1 host_name=es1
+es2 host_name=es2
+es3 host_name=es3
+es4 host_name=es4
+es5 host_name=es5
+
+[kibana_host]
+kibana host_name=kibana
+
+[logstash_host]
+logstash host_name=logstash
+
+[test_host]
+test host_name=test

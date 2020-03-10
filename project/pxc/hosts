@@ -1,0 +1,4 @@
+[pxc]
+pxc1 host_name=pxc1
+pxc2 host_name=pxc2
+pxc3 host_name=pxc3

@@ -1,0 +1,62 @@
+---
+- name: 安装zabbix监控服务器
+  hosts: zabbix
+  tasks: 
+    - name: 配置主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 环境准备：创建目录/root/mysql
+      file: 
+        path: /root/mysql
+        state: directory
+        mode: 0755
+    - name: 环境准备：nginx安装包
+      unarchive: 
+        src: file/nginx-1.12.2.tar.gz
+        dest: /root/
+    - name: 环境准备：mysql安装包
+      unarchive: 
+        src: file/mysql-5.7.17.tar
+        dest: /root/mysql/
+    - name: 环境准备：zabbix安装包
+      unarchive: 
+        src: file/zabbix-3.4.4.tar.gz
+        dest: /root/
+
+    - name: 执行安装脚本
+      script: script/zabbix_server.sh
+
+    - name: 安装inotify
+      unarchive: 
+        src: file/inotify-tools-3.13.tar.gz
+        dest: /root/ 
+    - shell: "./configure && make && make install"
+      args: 
+        chdir: /root/inotify-tools-3.13
+    - name: 发送密钥id_rsa
+      copy:
+        src: /root/.ssh/id_rsa
+        dest: /root/.ssh/
+        owner: root
+        group: root
+        mode: 0600
+    - name: 取消ssh首次连接check
+      shell: sed -ri '35a StrictHostKeyChecking no' /etc/ssh/ssh_config
+    - name: 安装keeplived
+      yum: 
+        name: keepalived
+        state: installed
+        update_cache: yes
+    - name: 同步配置文件
+      template: 
+        src: conf/keepalived.conf
+        dest: /etc/keepalived/
+    - name: 启动服务
+      service: 
+        name: keepalived
+        state: started
+        enabled: yes

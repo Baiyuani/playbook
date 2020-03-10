@@ -17,6 +17,7 @@
         src: conf/etcd.conf
         dest: /etc/etcd/
     - name: 同步配置文件
+      template: 
         src: "{{ item }}"
         dest: /etc/kubernetes/
       with_items: 
@@ -33,7 +34,7 @@
         - "kube-controller-manager"
         - "kube-scheduler"
         - "etcd"
-    - shell: etcdctl mk /atomic.io/network/config '{"Network": "10.254.0.0/16", "Backend": {"Type": "vxlan"}}'
+    - script: script/etcd.sh
     - name: 安装flannel
       yum: 
         name: flannel

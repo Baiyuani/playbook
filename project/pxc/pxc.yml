@@ -1,0 +1,49 @@
+---
+- name: 安装PXC集群
+  hosts: pxc
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: 安装依赖包
+      yum: 
+        name: percona-xtrabackup-24,qpress
+        state: installed
+        update_cache: yes
+
+    - name: 安装PXC集群软件
+      unarchive: 
+        src: file/Percona-XtraDB-Cluster-5.7.25-31.35-r463-el7-x86_64-bundle.tar
+        dest: /root/
+
+    - shell: 'yum -y install Percona-XtraDB-Cluster-*.rpm'
+      args: 
+        chdir: /root/
+
+    - name: 同步配置文件
+      tags: sync_conf
+      template: 
+        src: "{{ item }}"
+        dest: /etc/percona-xtradb-cluster.conf.d/
+        owner: root
+        group: root
+        mode: 0644
+      with_items: 
+        - "conf/mysqld.cnf"
+        - "conf/mysqld_safe.cnf"
+        - "conf/wsrep.cnf"
+    - script: script/pxc_mysql_conf.sh
+
+    - name: 初始化集群
+      script: script/init.sh
+      when: ansible_hostname == "pxc1"
+    - name: 启动
+      script: script/start.sh

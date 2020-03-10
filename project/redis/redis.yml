@@ -1,0 +1,53 @@
+---
+- name: 安装redis集群
+  hosts: redis
+  tasks: 
+    - name: 修改主机名
+      hostname:
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy:
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 安装依赖包
+      yum: 
+        name: gcc
+        update_cache: yes
+        state: installed
+
+    - name: 安装redis节点
+      unarchive:
+        src: file/redis-4.0.8.tar.gz
+        dest: /
+    - shell: make
+      args: 
+        chdir: /redis-4.0.8
+    - shell: make install
+      args: 
+        chdir: /redis-4.0.8
+     
+    - name: 初始化服务
+      script: script/init.sh
+  
+    - name: 同步配置文件
+      tags: sync_conf
+      notify: restart_redis
+      template: 
+        src: conf/6379.conf
+        dest: /etc/redis/
+        backup: yes
+    - shell: /etc/init.d/redis_6379 restart
+    - name: 同步脚本文件
+      template: 
+        src: conf/redis_6379
+        dest: /etc/init.d/
+        mode: 0755
+    - shell: echo "/etc/init.d/redis_6379 start" >> /etc/rc.local
+    - shell: chmod +x /etc/rc.local
+
+  handlers: 
+    - name: restart_redis
+      shell: /etc/init.d/redis_6379 restart

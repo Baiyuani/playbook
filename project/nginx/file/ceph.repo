@@ -1,0 +1,17 @@
+[ceph-tools]
+baseurl=ftp://192.168.1.252/cephrepo/Tools
+gpgcheck=0
+enabled=1
+name= ceph-tools
+
+[ceph-MON]
+baseurl=ftp://192.168.1.252/cephrepo/MON
+gpgcheck=0
+enabled=1
+name= ceph monitor rpm
+
+[ceph-OSD]
+baseurl=ftp://192.168.1.252/cephrepo/OSD
+gpgcheck=0
+enabled=1
+name= ceph osd rpm

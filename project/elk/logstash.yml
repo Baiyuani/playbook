@@ -1,0 +1,28 @@
+---
+- name: 安装logstash
+  hosts: logstash
+  tasks: 
+    - name: 修改主机名
+      hostname:
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy:
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 安装软件
+      yum:
+        name: java-1.8.0-openjdk,logstash
+        state: installed
+        update_cache: yes
+    - name: 同步配置文件
+      copy:
+        src: conf/logstash.conf
+        dest: /etc/logstash/
+        owner: root
+        group: root
+        mode: 0664
+    - name: 启动服务
+      shell: /opt/logstash/bin/logstash -f /etc/logstash/logstash.conf &

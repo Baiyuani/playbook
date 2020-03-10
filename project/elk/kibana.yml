@@ -1,0 +1,31 @@
+---
+- name: 安装kibana
+  hosts: kibana
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 配置主机名解析
+      copy:
+        src: /etc/hosts
+        dest: /etc/
+        owner: root
+        group: root
+        mode: 0644
+    - name: 安装软件
+      yum: 
+        name: kibana
+        state: installed
+        update_cache: yes
+    - name: 同步配置文件
+      copy: 
+        src: conf/kibana.yml
+        dest: /opt/kibana/config/
+        owner: root
+        group: root
+        mode: 0664
+    - name: 启动服务
+      service: 
+        name: kibana
+        state: started
+        enabled: yes

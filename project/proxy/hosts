@@ -1,0 +1,7 @@
+[ngxproxy]
+ngxproxy1 host_name=ngxproxy1
+ngxproxy2 host_name=ngxproxy2
+
+[haproxy]
+haproxy1 host_name=haproxy1 state_d=MASTER priority_d=150
+haproxy2 host_name=haproxy2 state_d=BACKUP priority_d=100

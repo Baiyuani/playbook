@@ -1,0 +1,15 @@
+[mysql]
+mysql1 host_name=mysql1 server_id=180
+mysql2 host_name=mysql2 server_id=181
+mysql3 host_name=mysql3 server_id=182
+mysql4 host_name=mysql4 server_id=183
+mysql5 host_name=mysql5 server_id=184
+mysql6 host_name=mysql6 server_id=185
+
+[mycat]
+mycat1 host_name=mycat1
+mycat2 host_name=mycat2
+mycat3 host_name=mycat3
+
+[mha_host]
+mha host_name=mha

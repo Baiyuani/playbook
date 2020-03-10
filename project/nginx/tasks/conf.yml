@@ -1,0 +1,12 @@
+---
+# configure .conf file and reload
+- name: 发送配置文件
+  copy: 
+    src: conf/nginx.conf
+    dest: /usr/local/nginx/conf/
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  tags: sync_conf
+  notify: nginx_reload

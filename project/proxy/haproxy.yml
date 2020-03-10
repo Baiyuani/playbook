@@ -1,0 +1,44 @@
+---
+- name: 为mysql集群配置haproxy代理
+  hosts: haproxy
+  tasks: 
+    - name: 设置主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 同步主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 安装软件包
+      yum: 
+        name: haproxy,keepalived
+        state: installed
+        update_cache: yes
+    - name: 同步配置文件
+      tags: sync_ha
+      notify: restart_ha
+      template: 
+        src: conf/haproxy.cfg
+        dest: /etc/haproxy/
+    - template: 
+        src: conf/keepalived.conf
+        dest: /etc/keepalived/
+      tags: sync_kd
+      notify: restart_kp
+    - service: 
+        name: haproxy
+        state: started
+        enabled: yes
+    - service: 
+        name: keepalived
+        state: started
+        enabled: yes
+  handlers: 
+    - name: restart_ha
+      service: 
+        name: haproxy
+        state: restarted
+    - name: restart_kp
+      service: 
+        name: keepalived
+        state: restarted

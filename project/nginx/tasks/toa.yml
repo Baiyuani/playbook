@@ -1,0 +1,9 @@
+---
+- name: 安装toa内核模块
+  copy: 
+    src: file/toa.ko
+    dest: /root/
+    owner: root
+    group: root
+    mode: 0644  
+- script: script/toa.sh

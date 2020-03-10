@@ -1,0 +1,4 @@
+---
+- hosts: test
+  tasks:
+    - shell: echo {{ ansible_eth0['ipv4']['address'] }} | awk -F[.] '{print $NF}' > /root/test.txt

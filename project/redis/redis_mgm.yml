@@ -1,0 +1,28 @@
+---
+- name: 安装管理节点
+  hosts: redis_mgm
+  tasks: 
+    - name: 修改主机名
+      hostname: 
+        name: "{{ host_name }}"
+    - name: 同步主机名解析
+      copy: 
+        src: /etc/hosts
+        dest: /etc/
+    - name: 安装ruby
+      yum: 
+        name: rubygems
+        update_cache: yes
+        state: installed
+    - copy: 
+        src: file/redis-3.2.1.gem
+        dest: /root/
+    - shell: gem install redis-3.2.1.gem
+      args: 
+        chdir: /root
+    - copy: 
+        src: file/redis-trib.rb
+        dest: /usr/local/bin/
+        mode: 0755
+    - name: 创建集群
+      script: script/create.sh

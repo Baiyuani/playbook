@@ -1,0 +1,18 @@
+---
+- name: 安装filebeat
+  yum: 
+    name: filebeat
+    state: installed
+    update_cache: yes
+- name: 同步配置文件
+  copy: 
+    src: conf/filebeat.yml
+    dest: /etc/filebeat/
+    owner: root
+    group: root
+    mode: 0644
+- name: 启动服务
+  service: 
+    name: filebeat
+    state: started
+    enabled: yes

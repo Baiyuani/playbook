@@ -1,0 +1,10 @@
+[dynamic]
+nginx1 host_name=nginx1
+nginx2 host_name=nginx2
+nginx3 host_name=nginx3
+nginx4 host_name=nginx4
+
+[static]
+nginx5 host_name=nginx5
+nginx6 host_name=nginx6
+nginx7 host_name=nginx7

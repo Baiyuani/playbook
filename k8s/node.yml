@@ -41,7 +41,7 @@
     - name: 启动服务
       service: 
         name: "{{ item }}"
-        state: started
+        state: restarted
         enabled: yes
       with_items: 
         - "flanneld"
